@@ -50,9 +50,10 @@ async function runCode({ language = "", code = "", input = "" }) {
 
   const result = await new Promise((resolve, reject) => {
     const executeCode = spawn(executeCodeCommand, executionArgs || []);
+    let startTime;
+    executeCode.on("spawn", () => (startTime = performance.now()));
     let output = "";
     let error = "";
-    const startTime = performance.now();
 
     const timer = setTimeout(async () => {
       executeCode.kill("SIGHUP");
