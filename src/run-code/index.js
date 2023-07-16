@@ -49,7 +49,10 @@ async function runCode({ language = "", code = "", input = "" }) {
   }
 
   const result = await new Promise((resolve, reject) => {
-    const executeCode = spawn(executeCodeCommand, executionArgs || []);
+    const executeCode = spawn("firejail", [
+      executeCodeCommand,
+      ...(executionArgs || []),
+    ]);
     let startTime;
     executeCode.on("spawn", () => (startTime = performance.now()));
     let output = "";
