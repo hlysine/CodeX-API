@@ -50,8 +50,9 @@ async function runCode({ language = "", code = "", input = "" }) {
 
   const result = await new Promise((resolve, reject) => {
     const executeCode = spawn(executeCodeCommand, executionArgs || []);
-    let output = "",
-      error = "";
+    let output = "";
+    let error = "";
+    const startTime = performance.now();
 
     const timer = setTimeout(async () => {
       executeCode.kill("SIGHUP");
@@ -60,6 +61,7 @@ async function runCode({ language = "", code = "", input = "" }) {
 
       reject({
         status: 408,
+        runtimeMs: performance.now() - startTime,
         error: `CodeX API Timed Out. Your code took too long to execute, over ${timeout} seconds. Make sure you are sending input as payload if your code expects an input.`,
       });
     }, timeout * 1000);
@@ -85,7 +87,7 @@ async function runCode({ language = "", code = "", input = "" }) {
 
     executeCode.on("exit", err => {
       clearTimeout(timer);
-      resolve({ output, error });
+      resolve({ output, error, runtimeMs: performance.now() - startTime });
     });
   });
 
